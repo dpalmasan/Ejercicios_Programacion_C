@@ -28,6 +28,7 @@ typedef struct Node {
 */
 typedef struct {
 	int size;		// Size of the queue
+	int lastID;		// ID of the last element inserted.
 	Node* first;	// beginning of queue
 	Node* last;		// end of queue
 } LinkedQueue;
@@ -35,6 +36,7 @@ typedef struct {
 // Initializes the queue
 void Init(LinkedQueue* queue) {
 	queue->size = 0;
+	queue->lastID = 1;
 	queue->first = NULL;
 	queue->last = NULL;
 }
@@ -50,7 +52,7 @@ bool enqueue(LinkedQueue *queue, double mass, coord3D pos, coord3D vel) {
 	Node* node = (Node*)malloc(sizeof(Node));
 	if (node == NULL) return false;
 	
-	node->ID = queue->size + 1;
+	node->ID = queue->lastID++;
 	node->mass = mass;
 	node->pos = pos;
 	node->vel = vel;
@@ -85,7 +87,7 @@ void printQueue(LinkedQueue queue) {
 // Frees memory from DB.
 void freeQueue(LinkedQueue *queue) {
 	Node* aux = queue->first;
-	while (aux) {
+	while (aux != NULL) {
 		Node* tmp = aux;
 		aux = aux->next;
 		free(tmp);	
@@ -177,6 +179,8 @@ int main(void) {
 	deleteObject(&q, 6);
 	printQueue(q);
 	printf("La base de datos ahora tiene %d objetos\n", size(&q));
+	enqueue(&q, 1, pos, vel);
+	printQueue(q);
 	
 	// Freeing allocated memory.
 	freeQueue(&q);
