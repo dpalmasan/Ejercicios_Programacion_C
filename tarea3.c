@@ -51,13 +51,13 @@ int size(LinkedQueue *queue) { return queue->size; }
 bool enqueue(LinkedQueue *queue, double mass, coord3D pos, coord3D vel) {
 	Node* node = (Node*)malloc(sizeof(Node));
 	if (node == NULL) return false;
-	
+
 	node->ID = queue->lastID++;
 	node->mass = mass;
 	node->pos = pos;
 	node->vel = vel;
 	node->next = NULL;
-	
+
 	if(isEmpty(queue)) {
 		queue->first = node;
 		queue->last = node;
@@ -74,11 +74,11 @@ void printQueue(LinkedQueue queue) {
 	if (isEmpty(&queue)) return;
 
 	Node *aux = queue.first;
-	
+
 	printf(" ID   m   posicion          velocidad\n");
 	printf("------------------------------------------------\n");
 	while(aux != NULL) {
-		printf("%4d %4.2f (%4.2f, %4.2f, %4.2f) (%4.2f, %4.2f, %4.2f)\n", aux->ID, 
+		printf("%4d %4.2f (%4.2f, %4.2f, %4.2f) (%4.2f, %4.2f, %4.2f)\n", aux->ID,
 			aux->mass, aux->pos.x, aux->pos.y, aux->pos.z, aux->vel.x, aux->vel.y, aux->vel.z);
 		aux = aux->next;
 	}
@@ -90,25 +90,27 @@ void freeQueue(LinkedQueue *queue) {
 	while (aux != NULL) {
 		Node* tmp = aux;
 		aux = aux->next;
-		free(tmp);	
+		free(tmp);
 	}
 	Init(queue);
 }
 
 // Moves an object to the first position in the queue, by ID
 void moveObject(LinkedQueue* queue, int ID) {
+    if (isEmpty(queue)) return;
+
 	// Checks whether we are trying to move the first element.
 	if (queue->first->ID == ID) return;
 
 	Node* aux = queue->first;
-	
+
 	while(aux->next) {
 		if (aux->next->ID == ID) {
 			Node* tmp = aux->next;
 			aux->next = aux->next->next;
 			tmp->next = queue->first;
-			queue->first = tmp;	
-			break;	
+			queue->first = tmp;
+			break;
 		}
 		aux = aux->next;
 	}
@@ -116,6 +118,7 @@ void moveObject(LinkedQueue* queue, int ID) {
 
 // Deletes an object from the queue, by ID. Returns true if successful, false otherwise.
 bool deleteObject(LinkedQueue* queue, int ID) {
+    if (isEmpty(queue)) return false;
 	Node* aux = queue->first;
 	if (queue->first->ID == ID) {
 		queue->first = aux->next;
@@ -154,6 +157,12 @@ int main(void) {
 	printf("==============================================\n");
 	printf("\tPrograma de testeo Base de Datos\n");
 	printf("==============================================\n\n");
+
+	printf("Cantidad de datos en la BD %d, comportamiento de deleteObject:\n", size(&q));
+	    if (!deleteObject(&q, 0)) {
+            printf("Fallo la funcion borrar!\n\n");
+    }
+
 	for (i = 0; i < 10; i++) {
 		pos.x = ((double)rand()/(double)RAND_MAX);
 		pos.y = ((double)rand()/(double)RAND_MAX);
@@ -181,7 +190,7 @@ int main(void) {
 	printf("La base de datos ahora tiene %d objetos\n", size(&q));
 	enqueue(&q, 1, pos, vel);
 	printQueue(q);
-	
+
 	// Freeing allocated memory.
 	freeQueue(&q);
 	return 0;
